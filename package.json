@@ -7,8 +7,12 @@
   "license": "Apache 2.0",
   "private": true,
   "dependencies": {
+    "bcryptjs": "^2.4.3",
     "express": "^4.17.1",
-    "http-proxy-middleware": "^0.20.0"
+    "http-proxy-middleware": "^0.20.0",
+    "inquirer": "^7.0.4",
+    "ip-regex": "^4.1.0",
+    "nedb": "^1.8.0"
   },
   "scripts": {
     "dev": "node index.js",
