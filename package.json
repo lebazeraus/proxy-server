@@ -7,7 +7,7 @@
   "license": "Apache 2.0",
   "private": true,
   "dependencies": {
-    "bcryptjs": "^2.4.3",
+    "commander": "^4.1.1",
     "express": "^4.17.1",
     "http-proxy-middleware": "^0.20.0",
     "inquirer": "^7.0.4",
@@ -16,6 +16,7 @@
   },
   "scripts": {
     "dev": "node index.js",
+    "c": "node index.js -c",
     "build": "nexe -t win32-x86-12.9.1"
   }
 }
