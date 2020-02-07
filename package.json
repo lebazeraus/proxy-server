@@ -1,0 +1,17 @@
+{
+  "name": "proxy-server",
+  "version": "1.0.0",
+  "description": "Servidor proxy",
+  "main": "index.js",
+  "author": "Abel Suárez",
+  "license": "Apache 2.0",
+  "private": true,
+  "dependencies": {
+    "express": "^4.17.1",
+    "http-proxy-middleware": "^0.20.0"
+  },
+  "scripts": {
+    "dev": "node index.js",
+    "build": "nexe -t win32-x86-12.9.1"
+  }
+}
