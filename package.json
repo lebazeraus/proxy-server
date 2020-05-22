@@ -1,6 +1,6 @@
 {
   "name": "proxy-server",
-  "version": "1.0.0",
+  "version": "1.2.0",
   "description": "Servidor proxy",
   "main": "index.js",
   "author": "Abel Suárez",
@@ -16,7 +16,7 @@
   },
   "scripts": {
     "dev": "node index.js",
-    "c": "node index.js -c",
-    "build": "nexe -t win32-x86-12.9.1"
+    "setting": "node index.js -c",
+    "build": "pkg -t node12-win-x86 index.js -o proxy-server.exe"
   }
 }
