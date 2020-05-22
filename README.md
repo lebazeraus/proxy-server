@@ -17,3 +17,9 @@ $ node index.js
 > Puerto: 3000
 > Proxy iniciado
 ```
+
+## Compilar
+Instale `npm i pkg -g` y use de la siguiente forma:
+```bash
+$ pkg index.js --out-path bin
+```
