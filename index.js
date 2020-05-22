@@ -1,11 +1,11 @@
 const path = require('path')
 const os = require('os')
+const program = require('commander')
+const express = require('express')
+const proxy = require('http-proxy-middleware')
 const inquirer = require('inquirer')
 const ipRegex = require('ip-regex')
 const Datastore = require('nedb')
-const express = require('express')
-const proxy = require('http-proxy-middleware')
-const program = require('commander')
 const tmp = path.join(os.tmpdir(), 'sp-ic')
 const db = new Datastore({ filename: tmp })
 
@@ -14,7 +14,7 @@ program.parse(process.argv)
 
 db.loadDatabase(function (err) {
   if (err) {
-    console.log('Iniciando Servidor: Error 001') // BD imposible de cargar
+    console.log('Error 001')
     return false
   }
   // CMD
@@ -32,13 +32,13 @@ db.loadDatabase(function (err) {
 
   db.find({}, function (err, docs) {
     if (err) {
-      console.log('Iniciando Servidor: Error 002') // BD imposible de leer
+      console.log('Error 002')
       return false
     }
 
     if (docs.length) {
       // Run server
-      runServer(docs[0].ip)
+      runServer(docs[0].ip, docs[0].port)
     } else {
       question()
     }
@@ -47,29 +47,29 @@ db.loadDatabase(function (err) {
 
 function question() {
   inquirer
-  .prompt([ { type: 'input', name: 'IP', message: 'Ingresar IP:' } ])
-  .then(({ IP }) => {
+  .prompt([ { type: 'input', name: 'IP', message: 'IP (Sin el puerto):' }, { type: 'input', name: 'port', message: 'Puerto:' } ])
+  .then(({ IP, port }) => {
     if ( ipRegex({exact: true}).test(IP)) {
       db.find({}, function (err, docs) {
         if (err) {
-          console.log('Iniciando Servidor: Error 003') // BD imposible de leer 
+          console.log('Error 003')
           return false
         }
         if (docs.length) {
-          db.update({ ip: docs[0].ip }, { ip: IP }, {}, function (err) {
+          db.update({ ip: docs[0].ip, port: docs[0].port }, { ip: IP, port }, {}, function (err) {
             if (err) {
-              console.log('Iniciando Servidor: Error 004') // BD imposible de leer 
+              console.log('Error 004')
               return false
             }
-            runServer(IP)
+            runServer(IP, port)
           })
         } else {
-          db.insert({ ip: IP }, function (err) {
+          db.insert({ ip: IP, port }, function (err) {
             if (err) {
-              console.log('Iniciando Servidor: Error 005') // BD imposible de leer 
+              console.log('Error 005')
               return false
             }
-            runServer(IP)
+            runServer(IP, port)
           })
         }
       })
@@ -80,17 +80,17 @@ function question() {
   })
 }
 
-function runServer(IP) {
+function runServer(IP, port) {
   const options = {
-    target: 'http://' + IP + ':4688',
+    target: 'http://' + IP + ':' + port,
     changeOrigin: true,
     logProvider: (provider) => { return provider  }
   }
   const app = express()
 
   app.use('/', proxy(options))
+  app.listen(port)
   console.log('...')
-  console.log('v1.1.0')
-  console.log('Iniciando Servidor: Ok')
-  app.listen(4688)
+  console.log('v1.2.0')
+  console.log('Proxy iniciado')
 }
