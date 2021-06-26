@@ -1,8 +1,9 @@
+const { version } = require('./package.json')
 const path = require('path')
 const os = require('os')
-const program = require('commander')
+const { program } = require('commander')
 const express = require('express')
-const proxy = require('http-proxy-middleware')
+const { createProxyMiddleware } = require('http-proxy-middleware')
 const inquirer = require('inquirer')
 const ipRegex = require('ip-regex')
 const Datastore = require('nedb')
@@ -18,7 +19,7 @@ db.loadDatabase(function (err) {
     return false
   }
   // CMD
-  if (program.config) {
+  if (program.opts().config) {
     inquirer
     .prompt([ { type: 'list', name: 'opcion', message: '¿Qué desea hacer?', choices: [{ name: 'Cambiar IP' }, { name: 'Salir' }] } ])
     .then(({ opcion }) => {
@@ -88,9 +89,9 @@ function runServer(IP, port) {
   }
   const app = express()
 
-  app.use('/', proxy(options))
+  app.use('/', createProxyMiddleware(options))
   app.listen(port)
   console.log('...')
-  console.log('v1.2.0')
+  console.log(`v${version}`)
   console.log('Proxy iniciado')
 }

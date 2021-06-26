@@ -10,16 +10,32 @@ Necesitará [Node.js](https://nodejs.org/en/) y [Git SCM](https://git-scm.com) i
 $ git clone https://github.com/lebazeraus/proxy-server.git
 ```
 
-## Uso
+## Uso en desarrollo
 ```bash
-$ node index.js
+$ npm run dev
 > IP: 127.0.0.1
 > Puerto: 3000
 > Proxy iniciado
 ```
+La IP y el puerto quedan guardadas en los temporales del sistema, para cambiar estas opciones use en desarrollo:
+```bash
+$ npm run dev -c
+```
+Desde el binario:
+```bash
+# En Windows
+$ ps-win-x86.exe -c
+```
+
+
 
 ## Compilar
-Instale `npm i pkg -g` y use de la siguiente forma:
+Instale `npm i -g pkg` y use de la siguiente forma:
 ```bash
 $ pkg index.js --out-path bin
+```
+
+Para Windows x86
+```bash
+$ npm run build
 ```
