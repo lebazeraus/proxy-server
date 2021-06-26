@@ -24,7 +24,7 @@ $ npm run dev -c
 Desde el binario:
 ```bash
 # En Windows
-$ ps-win-x86.exe -c
+$ ps-win-x64.exe -c
 ```
 
 
@@ -35,7 +35,7 @@ Instale `npm i -g pkg` y use de la siguiente forma:
 $ pkg index.js --out-path bin
 ```
 
-Para Windows x86
+Para Windows x64
 ```bash
 $ npm run build
 ```
