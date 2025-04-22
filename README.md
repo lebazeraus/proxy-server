@@ -1,41 +1,69 @@
-# Proxy Server
+# Proxy Server CLI
 
-Servidor proxy básico como herramienta CLI para conexiones a maquinas virtuales
+## Instrucciones de Instalación
 
-## Pre requisitos
-Necesitará [Node.js](https://nodejs.org/en/) y [Git SCM](https://git-scm.com) instalado previamente en su equipo.
+Para utilizar esta aplicación:
 
-## Instalación
+1. Asegúrate de tener Node.js **versión 18 o superior** instalado en tu sistema.
+2. Instala las dependencias ejecutando:
+   ```bash
+   npm install
+   ```
+3. Ejecuta la aplicación:
+   ```bash
+   node index.js
+   ```
+   o
+   ```bash
+   npm start
+   ```
+
+## Uso Avanzado
+
+Para configurar la aplicación sin iniciar el servidor:
+
 ```bash
-$ git clone https://github.com/lebazeraus/proxy-server.git
+node index.js -c
 ```
 
-## Uso en desarrollo
+o
+
 ```bash
-$ npm run dev
-> IP: 127.0.0.1
-> Puerto: 3000
-> Proxy iniciado
-```
-La IP y el puerto quedan guardadas en los temporales del sistema, para cambiar estas opciones use en desarrollo:
-```bash
-$ npm run dev -c
-```
-Desde el binario:
-```bash
-# En Windows
-$ ps-win-x64.exe -c
+node index.js --config
 ```
 
+---
 
+# Proxy Server CLI
 
-## Compilar
-Instale `npm i -g pkg` y use de la siguiente forma:
+## Installation Instructions
+
+To use this application:
+
+1. Make sure you have Node.js **version 18 or higher** installed on your system.
+2. Install dependencies by running:
+   ```bash
+   npm install
+   ```
+3. Run the application:
+   ```bash
+   node index.js
+   ```
+   or
+   ```bash
+   npm start
+   ```
+
+## Advanced Usage
+
+To configure the application without starting the server:
+
 ```bash
-$ pkg index.js --out-path bin
+node index.js -c
 ```
 
-Para Windows x64
+or
+
 ```bash
-$ npm run build
+node index.js --config
 ```
