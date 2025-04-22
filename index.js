@@ -4,23 +4,53 @@ import { program } from 'commander';
 import express from 'express';
 import { createProxyMiddleware } from 'http-proxy-middleware';
 import inquirer from 'inquirer';
-import Datastore from 'nedb';
+import fs from 'fs/promises';
 import chalk from 'chalk';
 import net from 'net';
 
 // Database configuration
 const tmp = path.join(os.tmpdir(), 'sp-ic');
-const db = new Datastore({ filename: tmp });
+const dbFile = tmp; // La base de datos será el archivo 'sp-ic' sin extensión
 
-// Promisify NeDB functions
-const promisifyDb = (db, method, ...args) => {
-  return new Promise((resolve, reject) => {
-    db[method](...args, (err, ...results) => {
-      if (err) reject(err);
-      else resolve(...results);
-    });
-  });
-};
+async function ensureDatabaseExists() {
+  try {
+    // Intentamos crear el directorio padre si no existe
+    await fs.mkdir(path.dirname(dbFile), { recursive: true });
+    try {
+      await fs.access(dbFile);
+    } catch (error) {
+      // El archivo no existe, lo creamos con un objeto JSON vacío inicial
+      await fs.writeFile(dbFile, '{}', 'utf8');
+    }
+  } catch (err) {
+    console.error(chalk.red('Error ensuring database directory/file:'), err);
+    process.exit(1);
+  }
+}
+
+async function getConfig() {
+  try {
+    const data = await fs.readFile(dbFile, 'utf8');
+    const config = JSON.parse(data);
+    return config.proxyConfig;
+  } catch (err) {
+    console.error(chalk.red('Error reading configuration file:'), err);
+    return null;
+  }
+}
+
+async function saveConfig(protocol, ip, port) {
+  try {
+    const data = await fs.readFile(dbFile, 'utf8');
+    const dbData = JSON.parse(data);
+    dbData.proxyConfig = { protocol, ip, port };
+    await fs.writeFile(dbFile, JSON.stringify(dbData, null, 2), 'utf8');
+    return true;
+  } catch (err) {
+    console.error(chalk.red('Error writing configuration file:'), err);
+    return false;
+  }
+}
 
 // Function to check if a port is in use
 async function isPortInUse(port) {
@@ -93,13 +123,15 @@ const languages = {
       '003': chalk.red('Error searching configuration:'),
       '004': chalk.red('Error updating configuration:'),
       '005': chalk.red('Error inserting configuration:'),
-      '006': chalk.red('Error starting the server:')
+      '006': chalk.red('Error al iniciar el servidor:')
     }
   }
 };
 
 // Main function
 async function main() {
+  await ensureDatabaseExists();
+
   // Configure command-line arguments
   program.option('-c, --config', 'Enter configuration mode');
   program.option('-p, --port <number>', 'Proxy server port (overrides configuration)');
@@ -124,21 +156,14 @@ async function main() {
   console.log(texts.welcome);
   console.log('======================\n');
 
-  try {
-    await promisifyDb(db, 'loadDatabase');
-  } catch (err) {
-    console.error(texts.errors['001'], err);
-    return false;
-  }
-
   let proxyPort = program.opts().port ? parseInt(program.opts().port) : null;
 
   // Configuration mode
   if (program.opts().config) {
     try {
-      const docs = await promisifyDb(db, 'find', {});
-      if (docs.length > 0) {
-        console.log(texts.configView, chalk.yellow(`${docs[0].protocol}://${docs[0].ip}${docs[0].port ? `:${docs[0].port}` : ''}`));
+      const config = await getConfig();
+      if (config) {
+        console.log(texts.configView, chalk.yellow(`${config.protocol}://${config.ip}${config.port ? `:${config.port}` : ''}`));
       } else {
         console.log(texts.noConfig);
       }
@@ -165,10 +190,9 @@ async function main() {
 
   // Search for existing configuration
   try {
-    const docs = await promisifyDb(db, 'find', {});
+    const config = await getConfig();
 
-    if (docs.length) {
-      const config = docs[0];
+    if (config) {
       await runServer(config.protocol, `${config.ip}${config.port ? `:${config.port}` : ''}`, proxyPort || 3000, texts); // Default proxy port 3000
     } else {
       await promptProxyConfig(texts);
@@ -217,18 +241,7 @@ async function promptProxyConfig(texts) {
   const port = portInput === '' ? null : parseInt(portInput);
 
   try {
-    const existingConfigs = await promisifyDb(db, 'find', {});
-    const configToSave = { protocol, ip: IP, port };
-
-    if (existingConfigs.length) {
-      await promisifyDb(db, 'update',
-        { _id: existingConfigs[0]._id },
-        configToSave,
-        {}
-      );
-    } else {
-      await promisifyDb(db, 'insert', configToSave);
-    }
+    await saveConfig(protocol, IP, port);
     console.log(texts.saved);
     await runServer(protocol, `${IP}${port ? `:${port}` : ''}`, 3000, texts); // Default proxy port 3000
   } catch (err) {
