@@ -1,6 +1,6 @@
 {
   "name": "proxy-server",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "description": "Basic proxy server with CLI configuration",
   "main": "index.js",
   "type": "module",
@@ -32,7 +32,6 @@
     "commander": "13.1.0",
     "express": "5.1.0",
     "http-proxy-middleware": "3.0.5",
-    "inquirer": "12.5.2",
-    "nedb": "1.8.0"
+    "inquirer": "12.5.2"
   }
 }
